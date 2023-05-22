@@ -3,6 +3,12 @@
 import os
 import json
 from models.base_model import BaseModel
+from models.amenity import Amenity
+from models.user import User
+from models.place import Place
+from models.city import City 
+from models.review import Review
+from models.state import State
 
 
 class FileStorage:
@@ -12,6 +18,12 @@ class FileStorage:
     """
     __file_path = 'file.json'
     __objects = {}
+    class_dict = {
+        "BaseModel": BaseModel,
+        "User": User, "Amenity": Amenity,
+        "Place": Place, "City": City, "Review": Review,
+        "State": State
+        }
 
     def all(self):
         """Returns the dictionary """
@@ -39,12 +51,12 @@ class FileStorage:
         """
             Deserializes the JSON file to
             __objects (only if the JSON file
-            """
+        """
         try:
-            if os.path.isfile(self.__file_path):
-                with open(self.__file_path, mode='r', encoding='UTF-8') as fil:
-                    for key, value in json.load(fil).items():
-                        value = eval(value['__class__'])(**value)
-                        self.__objects[key] = value
+            new_obj = {}
+            with open(self.__file_path, mode="r", encoding='UTF-8') as fil:
+                for key, value in json.load(fil).items():
+                    new_obj = self.class_dict[value['__class__']](**value)
+                    self.__objects[key] = new_obj
         except FileNotFoundError:
             pass
